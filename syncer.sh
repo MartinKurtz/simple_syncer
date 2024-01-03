@@ -34,11 +34,16 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                 # Use the appropriate tool for updating the mirror folder based on the repository type
                 case "$repository_type" in
                     "git")
-                        # Extract branch information from source.txt
-                        branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]')
-                        echo "  - Updating Git repository ($branch branch): $internet_address"
-                        cd "$mirror_folder"
-                        git pull origin "$branch"
+                        if [ -d "$mirror_folder/.git" ]; then
+                            branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]' || echo "main")
+                            echo "  - Updating Git repository ($branch branch): $internet_address"
+                            cd "$mirror_folder"
+                            git pull origin "$branch"
+                        else
+                            echo "  - Cloning Git repository: $internet_address"
+                            branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]' || echo "main")
+                            git clone -b "$branch" "$internet_address" "$mirror_folder"
+                        fi
                         ;;
                     "svn"|"subversion")
                         echo "  - Updating Subversion repository: $internet_address"
@@ -65,8 +70,7 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                 # Use the appropriate tool for cloning the repository
                 case "$repository_type" in
                     "git")
-                        # Extract branch information from source.txt
-                        branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]')
+                        branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]' || echo "main")
                         echo "  - Cloning Git repository ($branch branch): $internet_address"
                         git clone -b "$branch" "$internet_address" "$mirror_folder"
                         ;;
