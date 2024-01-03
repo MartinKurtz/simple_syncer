@@ -1,6 +1,7 @@
 USAGE:
 
 1.Specify at the beginning of the script the path where your repository clone folders are.
+
 2.For each repository create a folder and place inside that folder a file named source.txt containing the following data:
 
 
@@ -12,7 +13,6 @@ Git Repository:
 repository_type=git
 internet_address=https://github.com/example/example.git
 branch=example
-
 ```
 
 Subversion (SVN) Repository:
@@ -21,7 +21,6 @@ Subversion (SVN) Repository:
 repository_type=svn
 internet_address=https://svn.example.com/repo/trunk
 branch=none
-
 ```
 
 FTP Server:
