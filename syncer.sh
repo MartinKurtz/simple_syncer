@@ -7,6 +7,10 @@ ROOT_PATH="/path/to/repositories"
 DEFAULT_FTP_USER="anonymous"
 DEFAULT_FTP_PASSWORD="password"
 
+# Set download limits for FTP and website mirroring
+FTP_DOWNLOAD_LIMIT_KBPS=100  # Set your desired FTP download limit in kilobytes per second
+WEBSITE_DOWNLOAD_LIMIT_KBPS=200  # Set your desired website download limit in kilobytes per second
+
 # Iterate through each folder in the root path
 find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
     # Check if it's a directory
@@ -34,6 +38,7 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                 # Use the appropriate tool for updating the mirror folder based on the repository type
                 case "$repository_type" in
                     "git")
+                        # Check if it's a Git repository before attempting to update
                         if [ -d "$mirror_folder/.git" ]; then
                             branch=$(grep -i "branch" "$source_text_file" | cut -d'=' -f2 | tr -d '[:space:]' || echo "main")
                             echo "  - Updating Git repository ($branch branch): $internet_address"
@@ -51,14 +56,14 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                         svn update
                         ;;
                     "ftp")
-                        echo "  - Mirroring FTP server: $internet_address"
+                        echo "  - Mirroring FTP server: $internet_address with download limit $FTP_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for mirroring FTP
-                        wget --recursive --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" wget --recursive --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
                         ;;
                     "website")
-                        echo "  - Scraping website: $internet_address"
+                        echo "  - Scraping website: $internet_address with download limit $WEBSITE_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for scraping websites
-                        wget --recursive --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" wget --recursive --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
                         ;;
                     *)
                         echo "  - Unknown repository type: $repository_type"
@@ -80,14 +85,14 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                         svn checkout "$internet_address" "$mirror_folder"
                         ;;
                     "ftp")
-                        echo "  - Mirroring FTP server: $internet_address"
+                        echo "  - Mirroring FTP server: $internet_address with download limit $FTP_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for mirroring FTP
-                        wget --recursive --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" wget --recursive --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
                         ;;
                     "website")
-                        echo "  - Scraping website: $internet_address"
+                        echo "  - Scraping website: $internet_address with download limit $WEBSITE_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for scraping websites
-                        wget --recursive --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" wget --recursive --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
                         ;;
                     *)
                         echo "  - Unknown repository type: $repository_type"
