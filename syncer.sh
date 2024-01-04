@@ -8,6 +8,7 @@ DEFAULT_FTP_USER="anonymous"
 DEFAULT_FTP_PASSWORD="password"
 
 # Set download limits for FTP and website mirroring
+FILES_PER_SECOND_LIMIT=20
 FTP_DOWNLOAD_LIMIT_KBPS=100  # Set your desired FTP download limit in kilobytes per second
 WEBSITE_DOWNLOAD_LIMIT_KBPS=200  # Set your desired website download limit in kilobytes per second
 
@@ -67,12 +68,12 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                     "ftp")
                         echo "  - Mirroring FTP server: $internet_address with download limit $FTP_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for mirroring FTP
-                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" wget --recursive --tries="$MAX_TRIES" --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" -u "$FILES_PER_SECOND_LIMIT" wget --recursive --tries="$MAX_TRIES" --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
                         ;;
                     "website")
                         echo "  - Scraping website: $internet_address with download limit $WEBSITE_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for scraping websites
-                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" wget --recursive --tries="$MAX_TRIES" --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" -u "$FILES_PER_SECOND_LIMIT" wget --recursive --tries="$MAX_TRIES" --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
                         ;;
                     *)
                         echo "  - Unknown repository type: $repository_type"
@@ -95,12 +96,12 @@ find "$ROOT_PATH" -maxdepth 1 -type d | while read -r folder; do
                     "ftp")
                         echo "  - Mirroring FTP server: $internet_address with download limit $FTP_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for mirroring FTP
-                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" wget --recursive --tries="$MAX_TRIES" --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$FTP_DOWNLOAD_LIMIT_KBPS" -u "$FILES_PER_SECOND_LIMIT" wget --recursive --tries="$MAX_TRIES" --no-clobber --no-parent --ftp-user="${DEFAULT_FTP_USER}" --ftp-password="${DEFAULT_FTP_PASSWORD}" -P "$mirror_folder" "$internet_address"
                         ;;
                     "website")
                         echo "  - Scraping website: $internet_address with download limit $WEBSITE_DOWNLOAD_LIMIT_KBPS KB/s"
                         # Modify this command based on the specific requirements for scraping websites
-                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" wget --recursive --tries="$MAX_TRIES" --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
+                        trickle -s -d "$WEBSITE_DOWNLOAD_LIMIT_KBPS" -u "$FILES_PER_SECOND_LIMIT" wget --recursive --tries="$MAX_TRIES" --no-clobber --page-requisites --html-extension --convert-links --domains "$internet_address" --no-parent -P "$mirror_folder" "$internet_address"
                         ;;
                     *)
                         echo "  - Unknown repository type: $repository_type"
